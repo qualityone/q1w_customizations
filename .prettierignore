@@ -1,0 +1,5 @@
+node_modules/
+dist/
+__mocks__/
+*.min.js
+**/third_party/

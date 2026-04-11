@@ -1,0 +1,72 @@
+{
+  "ignorePatterns": ["dist/", "node_modules/", "__mocks__/", "*.min.js", "**/third_party/"],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "amd": true,
+    "commonjs": true
+  },
+  "extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
+  "plugins": ["prettier", "import"],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "globals": {
+    "define": "readonly",
+    "require": "readonly",
+    "jQuery": "readonly",
+    "$": "readonly",
+    "console": "readonly"
+  },
+  "settings": {
+    "import/ignore": ["^N/.*$"],
+    "import/resolver": {
+      "node": {
+        "extensions": [".js"],
+        "moduleDirectory": ["node_modules", "src"]
+      }
+    }
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-const": "error",
+    "no-const-assign": "error",
+    "no-use-before-define": "error",
+    "no-undef": "error",
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-console": "off",
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "all"],
+    "no-throw-literal": "error",
+    "prefer-template": "warn",
+    "no-nested-ternary": "error",
+    "no-unneeded-ternary": "error",
+    "no-duplicate-imports": "error",
+    "no-useless-rename": "error",
+    "object-shorthand": ["warn", "always"],
+    "prefer-destructuring": ["warn", { "object": true, "array": false }],
+    "prettier/prettier": "error",
+    "import/no-unresolved": ["error", { "ignore": ["^N/", "^third_party/"] }],
+    "import/named": "error",
+    "import/default": "error",
+    "import/export": "error",
+    "import/no-named-as-default": "warn",
+    "import/no-named-as-default-member": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.js", "**/__tests__/**/*.js"],
+      "env": {
+        "jest": true
+      }
+    },
+    {
+      "files": ["gulpfile.babel.js", "gulp/**/*.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

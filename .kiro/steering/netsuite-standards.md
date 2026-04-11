@@ -1,0 +1,82 @@
+---
+inclusion: always
+---
+
+# NetSuite SDF Standards
+
+## Code Style
+
+- ES6 only, transpiled to AMD 2.1 via Babel → `dist/`
+- ES6 `import`/`export`, never CommonJS. `const` default, `let` if reassigning, never `var`
+- `===`/`!==` only. Arrow functions, destructuring, template literals preferred
+- Server-side scripts: No `console.log` (use `N/log`). Client scripts: use `console.log`/`.error`/`.info` (not `N/log`)
+- No hardcoded IDs (use constants), no deep callbacks
+
+## JSDoc
+
+- Entry points: `@NApiVersion 2.1 | @NScriptType <Type> | @NModuleScope Public | @author | @description`
+- Modules: `@module q1w_<name> | @author | @description`
+
+## Imports Order
+
+NetSuite modules → Managers → DAOs → Helpers → Constants
+
+## Exports
+
+- **`export default` only** — no named exports (`export const`, `export { }`). The AMD plugin only converts `export default` → `return`; named exports are left as-is and break in AMD
+- UE: `export default { beforeLoad, beforeSubmit, afterSubmit }`
+- CS: `export default { pageInit, fieldChanged, saveRecord }`
+- SL: `export default { onRequest }` · SS: `export default { execute }`
+- MR: `export default { getInputData, map, reduce, summarize }`
+- Constants/Modules: declare with plain `const`, bundle in `export default { ... }` at bottom
+- Destructured imports (`import { X } from '...'`) still work — the AMD plugin destructures from the returned object
+
+## Constants (single-file pattern)
+
+- `q1w_global_constants.js` — plain objects, no `Object.freeze`, NO `N/runtime` import. Import directly into scripts for full intellisense support
+- Environment/account detection: use `q1w_global_helper.js` in `modules/helper/` with a `getEnvAccount()` function (uses `N/runtime` internally)
+- All scripts: `import C from 'q1w_global_constants';` (direct import, no init wrapper)
+- `q1w_global_constants_init.js` is deprecated — do NOT use
+
+## Error Handling
+
+- Every function: try-catch + `const logTitle = '<file> => <fn>';`
+- Modules: catch → `log.error` → re-throw
+- Entry points: catch → `log.error` → do NOT re-throw (except `ValidationError` with `isValidationError = true`)
+- Log format: `log.error({ title: logTitle, details: JSON.stringify({ message: error.message, stack: error.stack }) })`
+- No empty catches, no generic messages, no catch without log
+- ValidationError: extends Error, set `this.isValidationError = true` in constructor
+
+## Naming
+
+- Scripts: `q1w_<record>_<ue|cs|sl|ss|mr>.js` (all lowercase, `q1w_` prefix)
+- Modules: `q1w_<domain>_manager.js` / `q1w_<entity>_dao.js` / `q1w_<purpose>_helper.js`
+- SDF: `customscript_q1w_` / `customdeploy_q1w_` / `custbody_q1w_` / `custcol_q1w_` / `custentity_q1w_` / `custitem_q1w_`
+- Custom records: `customrecord_q1w_<name>` · Lists: `customlist_q1w_<name>`
+- Multiple scripts per record: `q1w_salesorder_ue_2.js`
+
+## Directory Structure
+
+`src/FileCabinet/SuiteScripts/beyond-cloud-consulting/` → `userevent/`, `clientscript/`, `suitelet/`, `scheduledscript/`, `map_reduce/`, `modules/{managers,dao,helper}/`, `constants/`
+
+## Module Rules
+
+- Managers → DAOs + Helpers (never reverse). No circular deps
+- Single responsibility, JSDoc on exports, max 30-40 lines/fn
+- `q1w_global_helper.js` in `modules/helper/` — exports `getEnvAccount()` for environment/account detection via `N/runtime`, plus common UI/search/utility functions
+
+## UserEvent Rules
+
+- One UE per record type, split at >10 imports (ue = beforeLoad/beforeSubmit, ue_2 = afterSubmit)
+- Thin entry points (max 20-30 lines), delegate to managers. `log.debug` at entry/exit
+- Handle CREATE/EDIT/DELETE(skip)/XEDIT/COPY
+- Check `runtime.executionContext` to prevent recursion
+- Performance: `Date.now()` timing, log duration via `log.audit` in `finally`
+
+## Build
+
+`npm run build` (transpile) · `npm run build:notranspile` (copy only)
+
+## Good Practice
+
+- When you hit an error, fix a bug, or learn something non-obvious (terminal, code, config, infra), append a one-liner to `.kiro/steering/learnings.md`. Keep entries ultra-short (<120 chars or more less). No fluff. Read learnings first — never add duplicates.

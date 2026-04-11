@@ -1,0 +1,37 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current"
+        }
+      }
+    ]
+  ],
+  "overrides": [
+    {
+      "test": "./src/",
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            },
+            "modules": false
+          }
+        ]
+      ],
+      "plugins": [
+        [
+          "babel-plugin-preserve-comment-header",
+          {
+            "pattern": "@N"
+          }
+        ],
+        "transform-es2015-modules-simple-desctructure-amd"
+      ]
+    }
+  ]
+}
