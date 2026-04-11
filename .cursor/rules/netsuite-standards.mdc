@@ -57,7 +57,7 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 ## Directory Structure
 
-`src/FileCabinet/SuiteScripts/beyond-cloud-consulting/` → `userevent/`, `clientscript/`, `suitelet/`, `scheduledscript/`, `map_reduce/`, `modules/{managers,dao,helper}/`, `constants/`
+`src/FileCabinet/SuiteScripts/quality_one_wireless/` → `userevent/`, `clientscript/`, `suitelet/`, `scheduledscript/`, `map_reduce/`, `modules/{managers,dao,helper}/`, `constants/`
 
 ## Module Rules
 
