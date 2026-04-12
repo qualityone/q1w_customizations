@@ -80,7 +80,3 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 ## Good Practice
 
 - When you hit an error, fix a bug, or learn something non-obvious (terminal, code, config, infra).
-
-- Prefer N/record record.submitFields when we have record internal id and need to update only body level fields, it doesn't work on line items.
-
-- Perfer N/search search.lookupFields when we have record internal id and want to search something that would exist on body level, it doesn't work on line items.

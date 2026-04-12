@@ -376,6 +376,40 @@ const GLOBAL = {
 };
 
 /**
+ * Online webstore inventory sync (Map/Reduce) — record/field script ids only (no N/* imports)
+ */
+const INVENTORY_SYNC = {
+  /** Reduce → summarize key; value is `lastquantityavailablechange` text (same format as search). */
+  MR_OUTPUT_KEY_LAST_QTY_CHANGE: 'lastQtyChange',
+  /** Online Webstore Item Field must be a standard item body custom field id */
+  STORE_ITEM_FIELD_ID_PREFIX: 'custitem_',
+  /** Item internal id that does not exist — used for no-op search when getInputData aborts safely */
+  NOOP_ITEM_INTERNAL_ID: '0',
+  ITEM_SEARCH: {
+    TYPE: 'item',
+    ITEM_TYPES: ['Assembly', 'InvtPart'],
+    /** Join id used in item search columns (must match account / custom record join) */
+    ITEM_CUSTOM_RECORD_JOIN: 'CUSTRECORD_Q1W_ITEM',
+    /**
+     * Item search filter: only items with Q1W item custom record link.
+     * TODO: Confirm join + field ids in Search UI if this filter returns no rows.
+     */
+    ITEM_LINK_FILTER_FIELD: 'custrecord_q1w_item.custrecord_q1w_item',
+    LAST_QTY_CHANGE_FIELD: 'lastquantityavailablechange',
+    COLUMNS: {
+      INTERNAL_ID: 'internalid',
+      ITEM_ID: 'itemid',
+      TYPE: 'type',
+      LAST_QTY_CHANGE: 'lastquantityavailablechange',
+      QTY_AVAILABLE: 'quantityavailable',
+      /** Joined from CUSTRECORD_Q1W_ITEM */
+      STORE_ITEM_FIELD: 'custrecord_q1w_store_item_field',
+      BUFFER: 'custrecord_q1w_buffer',
+    },
+  },
+};
+
+/**
  * Custom Field IDs
  * Add your project-specific custom fields here
  */
@@ -396,13 +430,13 @@ const CUSTOM_FIELD_IDS = {
  * Add your project-specific custom records here
  */
 const CUSTOM_RECORDS = {
-  // ERP_CONFIG: {
-  //   ID: 'customrecord_q1w_erp_config',
-  //   FIELDS: {
-  //     KEY: 'custrecord_q1w_config_key',
-  //     VALUE: 'custrecord_q1w_config_value',
-  //   },
-  // },
+  /** Designed as a single-row record; scripts read/update the first row only (`getRange` 0–1). */
+  ONLINE_WEBSTORE_CONFIG: {
+    ID: 'customrecord_q1w_online_webstore_config',
+    FIELDS: {
+      LAST_QTY_AVAILABLE_CHANGE: 'custrecord_q1w_last_qty_available_change',
+    },
+  },
 };
 
 /**
@@ -478,4 +512,5 @@ export default {
   LANGUAGES,
   CURRENCIES,
   ENVIRONMENT_SPECIFIC_CONSTANTS,
+  INVENTORY_SYNC,
 };
