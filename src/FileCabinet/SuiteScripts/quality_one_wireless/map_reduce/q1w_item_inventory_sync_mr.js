@@ -15,6 +15,7 @@
 import log from 'N/log';
 import record from 'N/record';
 import search from 'N/search';
+import task from 'N/task';
 
 import C from '../constants/q1w_global_constants';
 import H from '../modules/helper/q1w_inventory_sync_helper';
@@ -69,6 +70,14 @@ const map = (context) => {
       log.audit({
         title: `${logTitle} — skipping, storeItemField must start with ${C.INVENTORY_SYNC.STORE_ITEM_FIELD_ID_PREFIX}`,
         details: `${itemId} | ${storeItemField}`,
+      });
+      return;
+    }
+
+    if (quantityAvailable === undefined || quantityAvailable === null) {
+      log.audit({
+        title: `${logTitle} — skipping, quantityAvailable is undefined or null`,
+        details: `${itemId} | ${quantityAvailable}`,
       });
       return;
     }
@@ -220,6 +229,24 @@ const summarize = (context) => {
       title: logTitle,
       details: JSON.stringify({ message: error.message, stack: error.stack }),
     });
+  } finally {
+    const subLog = `${logTitle} — queue kit inventory SS`;
+    try {
+      const dep = C.DEPLOYMENTS.KIT_INVENTORY_SYNC_SS;
+      task
+        .create({
+          taskType: task.TaskType.SCHEDULED_SCRIPT,
+          scriptId: dep.SCRIPT_ID,
+          deploymentId: dep.DEPLOYMENT_ID,
+        })
+        .submit();
+      log.audit({ title: subLog, details: 'Submitted' });
+    } catch (taskErr) {
+      log.error({
+        title: subLog,
+        details: JSON.stringify({ message: taskErr.message, stack: taskErr.stack }),
+      });
+    }
   }
 
   try {

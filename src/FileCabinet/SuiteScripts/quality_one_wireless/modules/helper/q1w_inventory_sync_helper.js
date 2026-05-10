@@ -137,6 +137,39 @@ const getWatermarkDateText = () => {
 };
 
 /**
+ * Watermark for kit sync: `LAST_QTY_AVAILABLE_CHANGE_KIT` on singleton config record.
+ *
+ * @returns {string}
+ */
+const getKitWatermarkDateText = () => {
+  const logTitle = 'q1w_inventory_sync_helper => getKitWatermarkDateText';
+  try {
+    const cfg = C.CUSTOM_RECORDS.ONLINE_WEBSTORE_CONFIG;
+    const fieldKit = cfg.FIELDS.LAST_QTY_AVAILABLE_CHANGE_KIT;
+    const results = search
+      .create({
+        type: cfg.ID,
+        columns: [search.createColumn({ name: C.GLOBAL.INTERNAL_ID }), search.createColumn({ name: fieldKit })],
+      })
+      .run()
+      .getRange({ start: 0, end: 1 });
+
+    if (!results.length) {
+      return format.format({ value: new Date(), type: format.Type.DATETIME }).replace(/:\d{2}(\s?[ap]m)/i, '$1');
+    }
+
+    const raw = results[0].getValue({ name: fieldKit });
+    if (raw === null || raw === undefined || String(raw).trim() === '') {
+      return format.format({ value: new Date(), type: format.Type.DATETIME }).replace(/:\d{2}(\s?[ap]m)/i, '$1');
+    }
+    return String(raw);
+  } catch (error) {
+    logError(logTitle, error);
+    throw error;
+  }
+};
+
+/**
  * Item search that matches nothing (safe fallback when getInputData cannot build real input).
  *
  * @returns {search.Search}
@@ -204,12 +237,71 @@ const createChangedItemsSearch = (filterDate) => {
   }
 };
 
+/**
+ * Kit item search: members whose last available-qty change is on/after the kit watermark.
+ *
+ * @param {string} filterDate Text/datetime for `memberitem.lastquantityavailablechange` onorafter
+ * @returns {search.Search}
+ */
+const createKitChangedItemsSearch = (/*filterDate*/) => {
+  const logTitle = 'q1w_inventory_sync_helper => createKitChangedItemsSearch';
+  try {
+    const kit = C.INVENTORY_SYNC.KIT_SEARCH;
+    const join = kit.ITEM_CUSTOM_RECORD_JOIN;
+    const memberJoin = kit.MEMBER_ITEM_JOIN;
+    const cols = kit.COLUMNS;
+
+    return search.create({
+      type: kit.TYPE,
+      filters: [
+        [cols.TYPE, C.GLOBAL.ANY_OF, ...kit.ITEM_TYPES],
+        C.GLOBAL.AND,
+        [kit.ITEM_LINK_FILTER_FIELD, C.GLOBAL.NONE_OF, C.GLOBAL.NONE],
+        // C.GLOBAL.AND,
+        // [kit.MEMBER_LAST_QTY_FILTER_FIELD, 'onorafter', filterDate],
+      ],
+      columns: [
+        search.createColumn({ name: cols.INTERNAL_ID, label: 'Internal ID' }),
+        search.createColumn({ name: cols.ITEM_ID, label: 'Kit Item' }),
+        search.createColumn({ name: cols.MEMBER_ITEM, label: 'Kit Member Item' }),
+        search.createColumn({
+          name: cols.MEMBER_QTY_AVAILABLE,
+          join: memberJoin,
+          label: 'Kit Member Item Available Quantity',
+        }),
+        search.createColumn({
+          name: cols.MEMBER_LAST_QTY_CHANGE,
+          join: memberJoin,
+          label: 'Kit Member Item Last Quantity Available Change',
+          sort: search.Sort.ASC,
+        }),
+        search.createColumn({ name: cols.MEMBER_QUANTITY, label: 'Member Item Quantity for Kit' }),
+        search.createColumn({
+          name: cols.BUFFER,
+          join,
+          label: 'Kit Item Buffer',
+        }),
+        search.createColumn({
+          name: cols.STORE_ITEM_FIELD,
+          join,
+          label: 'Online Webstore Item Field',
+        }),
+      ],
+    });
+  } catch (error) {
+    logError(logTitle, error);
+    throw error;
+  }
+};
+
 export default {
   buildJoinedResultKey,
   getSearchCellValue,
   getSearchCellText,
   isValidStoreItemFieldId,
   getWatermarkDateText,
+  getKitWatermarkDateText,
   createNoopItemSearch,
   createChangedItemsSearch,
+  createKitChangedItemsSearch,
 };

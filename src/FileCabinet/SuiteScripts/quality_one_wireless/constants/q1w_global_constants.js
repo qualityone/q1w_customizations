@@ -390,10 +390,6 @@ const INVENTORY_SYNC = {
     ITEM_TYPES: ['Assembly', 'InvtPart'],
     /** Join id used in item search columns (must match account / custom record join) */
     ITEM_CUSTOM_RECORD_JOIN: 'CUSTRECORD_Q1W_ITEM',
-    /**
-     * Item search filter: only items with Q1W item custom record link.
-     * TODO: Confirm join + field ids in Search UI if this filter returns no rows.
-     */
     ITEM_LINK_FILTER_FIELD: 'custrecord_q1w_item.custrecord_q1w_item',
     LAST_QTY_CHANGE_FIELD: 'lastquantityavailablechange',
     COLUMNS: {
@@ -405,6 +401,27 @@ const INVENTORY_SYNC = {
       /** Joined from CUSTRECORD_Q1W_ITEM */
       STORE_ITEM_FIELD: 'custrecord_q1w_store_item_field',
       BUFFER: 'custrecord_q1w_buffer',
+    },
+  },
+  /** Kit/Package item search — same Q1W item join as assembly/inventory search */
+  KIT_SEARCH: {
+    TYPE: 'kititem',
+    ITEM_TYPES: ['Kit'],
+    ITEM_LINK_FILTER_FIELD: 'custrecord_q1w_item.custrecord_q1w_item',
+    ITEM_CUSTOM_RECORD_JOIN: 'CUSTRECORD_Q1W_ITEM',
+    MEMBER_ITEM_JOIN: 'memberItem',
+    /** Verify in Search UI if filter returns unexpected rows */
+    MEMBER_LAST_QTY_FILTER_FIELD: 'memberitem.lastquantityavailablechange',
+    COLUMNS: {
+      INTERNAL_ID: 'internalid',
+      ITEM_ID: 'itemid',
+      TYPE: 'type',
+      MEMBER_ITEM: 'memberitem',
+      MEMBER_QTY_AVAILABLE: 'quantityavailable',
+      MEMBER_LAST_QTY_CHANGE: 'lastquantityavailablechange',
+      MEMBER_QUANTITY: 'memberquantity',
+      BUFFER: 'custrecord_q1w_buffer',
+      STORE_ITEM_FIELD: 'custrecord_q1w_store_item_field',
     },
   },
 };
@@ -435,6 +452,7 @@ const CUSTOM_RECORDS = {
     ID: 'customrecord_q1w_online_webstore_config',
     FIELDS: {
       LAST_QTY_AVAILABLE_CHANGE: 'custrecord_q1w_last_qty_available_change',
+      LAST_QTY_AVAILABLE_CHANGE_KIT: 'custrecord_last_qty_available_chang_kit',
     },
   },
 };
@@ -456,10 +474,11 @@ const CUSTOM_LISTS = {
  * Store script and deployment IDs for reference
  */
 const DEPLOYMENTS = {
-  // SALES_ORDER_UE: {
-  //   SCRIPT_ID: 'customscript_q1w_salesorder_ue',
-  //   DEPLOYMENT_ID: 'customdeploy_q1w_salesorder_ue',
-  // },
+  /** Replace with account script + deployment ids after creating the Scheduled Script record */
+  KIT_INVENTORY_SYNC_SS: {
+    SCRIPT_ID: 'customscript_q1w_item_inv_sync_for_kits',
+    DEPLOYMENT_ID: 'customdeploy_q1w_item_inv_sync_for_kits',
+  },
 };
 
 /**
