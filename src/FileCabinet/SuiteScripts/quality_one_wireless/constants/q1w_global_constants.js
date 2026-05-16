@@ -512,6 +512,15 @@ const CURRENCIES = {
   // Add other currencies as needed
 };
 
+const API = {
+  RESPONSE: {
+    SUCCESS: {
+      CODE: 200,
+      TYPE: 'Success',
+    },
+  },
+};
+
 // Default export with all constants
 export default {
   RECORD_TYPES,
@@ -532,4 +541,5 @@ export default {
   CURRENCIES,
   ENVIRONMENT_SPECIFIC_CONSTANTS,
   INVENTORY_SYNC,
+  API,
 };

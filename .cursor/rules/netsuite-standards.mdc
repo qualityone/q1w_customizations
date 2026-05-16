@@ -35,7 +35,8 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 - `q1w_global_constants.js` — plain objects, no `Object.freeze`, NO `N/runtime` import. Import directly into scripts for full intellisense support
 - Environment/account detection: use `q1w_global_helper.js` in `modules/helper/` with a `getEnvAccount()` function (uses `N/runtime` internally)
-- All scripts: `import C from 'q1w_global_constants';` (direct import, no init wrapper)
+- All scripts: `import CONSTANTS from 'q1w_global_constants';` (direct import, no init wrapper — never use single-letter aliases like `C`)
+- Never use single-letter local aliases for destructured objects (e.g. `const F = RECORD.FIELDS`) — use descriptive names like `APC_FIELDS`, `VCP_FIELDS`
 - `q1w_global_constants_init.js` is deprecated — do NOT use
 
 ## Error Handling
@@ -59,12 +60,16 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 `src/FileCabinet/SuiteScripts/quality_one_wireless/` → `userevent/`, `clientscript/`, `suitelet/`, `scheduledscript/`, `map_reduce/`, `modules/{managers,dao,helper}/`, `constants/`
 
+- **Prefer SuiteQL (`N/query`) over saved searches and `N/search`** — queries are faster, governance-friendly, more readable, and keep the SQL in source control instead of hidden in NetSuite UI
+- Use saved searches only when SuiteQL cannot express the requirement (e.g., formula columns, summary types that rely on saved search behavior) — justify with a comment
+- For ad-hoc `N/search` usage, call `searchRecords({ type, filters, columns, fieldmap })` from `bcc_global_helper.js` instead of hand-rolling `search.create` + paging loops
 ## Module Rules
 
 - Managers → DAOs + Helpers (never reverse). No circular deps
 - Single responsibility, JSDoc on exports, max 30-40 lines/fn
 - `q1w_global_helper.js` in `modules/helper/` — exports `getEnvAccount()` for environment/account detection via `N/runtime`, plus common UI/search/utility functions
 
+- **Batch field access:** when 3+ `getValue`/`setValue` or `getSublistValue`/`setSublistValue` calls run in a row against the same record, use the batch helpers in `bcc_global_helper.js` (`getValues`, `setValues`, `getSublistValues`, `setSublistValues`, `getCurrentSublistValues`, `setCurrentSublistValues`). Pass `{ record, sublistId?, line?, fieldIds | values }` and let the helper loop. Reduces line count and centralizes error handling around field access
 ## UserEvent Rules
 
 - One UE per record type, split at >10 imports (ue = beforeLoad/beforeSubmit, ue_2 = afterSubmit)
@@ -79,4 +84,4 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 ## Good Practice
 
-- When you hit an error, fix a bug, or learn something non-obvious (terminal, code, config, infra).
+- When you hit an error, fix a bug, or learn something non-obvious (terminal, code, config, infra), append a one-liner to `.cursor/rules/learnings.mdc`. Keep entries ultra-short (<120 chars or more less). No fluff. Read learnings first — never add duplicates.

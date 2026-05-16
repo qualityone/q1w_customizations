@@ -51,5 +51,4 @@ jest_*
 # Debug
 .debug/
 
-src/FileCabinet/SuiteScripts/quality_one_wireless/modules/third_party/
 *backup*
