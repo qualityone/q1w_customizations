@@ -22,3 +22,5 @@ alwaysApply: true
 - removeLine on recmach sublist does NOT delete child records — it just unreferences them, leaving dangling records
 - To properly handle edits: track detail IDs in hidden sublist column, update existing via record.load/save, delete removed via record.delete, add new via recmach
 - SuiteQL: `createdfrom` is on `transactionline`, not `transaction`—use `tl.createdfrom` + `tl.transaction` (e.g. IN subquery) for “created from” links
+- SS2.1 RESTlet JSON GET/POST: Postman must send `Content-Type: application/json`; XML header on JSON return → UNEXPECTED_ERROR
+- Empty XML tags can parse as Object.create(null); coerce to '' before String() to avoid TypeError

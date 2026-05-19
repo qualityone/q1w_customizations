@@ -519,6 +519,55 @@ const API = {
       TYPE: 'Success',
     },
   },
+  ERRORS: {
+    BAD_REQUEST: {
+      TYPE: 'BAD_REQUEST',
+      MESSAGE: 'Error in request parameters or body. Please verify that you are using the correct format.',
+    },
+    NOT_FOUND: {
+      TYPE: 'NOT_FOUND',
+      MESSAGE: 'The resource you requested could not be found.',
+    },
+    INTERNAL_SERVER_ERROR: {
+      TYPE: 'INTERNAL_SERVER_ERROR',
+      MESSAGE: 'Internal server error. Please contact support.',
+    },
+  },
+  VALIDATION: {
+    ERROR_LABEL: 'validation_error',
+  },
+};
+
+const TELGOO5 = {
+  SYSTEM: 'Telgoo5',
+  FILENAME: 'Q1W NetSuite',
+  SUCCESS_DESCRIPTION: 'Message Successful',
+  TRANSACTION_NAMES: {
+    SALES_ORDER: 'sales-order-submission',
+    RETURN_AUTHORIZATION: 'return-authorization-submission',
+  },
+  SHIP_VIA: ['G2DAYP', 'UPSR', 'UPSS'],
+  QUEUE_ACTIONS: {
+    IMPORT_ORDER: 'Telgoo5/ImportOrder',
+    IMPORT_RETURN: 'Telgoo5/ImportReturnAuthorization',
+  },
+  RECORD_TYPES: {
+    INBOUND_ORDER: 'TELGOO5_INBOUND_ORDER',
+    INBOUND_RETURN: 'TELGOO5_INBOUND_RETURN',
+  },
+  RESTLET_ACTIONS: {
+    POST_ORDER: 'post_telgoo5_order',
+    POST_RETURN: 'post_telgoo5_return',
+  },
+  XML_ACTIONS: ['post_telgoo5_order', 'post_telgoo5_return'],
+  ROUTING_ELEMENT: 'action',
+  MESSAGE_ROOT: 'message',
+  XML_ERRORS: {
+    VALIDATION_ERROR: 'VALIDATION_ERROR',
+    NOT_FOUND: 'NotFoundError',
+    INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+  },
+  MAX_ORDER_NUMBER_LENGTH: 25,
 };
 
 // Default export with all constants
@@ -542,4 +591,5 @@ export default {
   ENVIRONMENT_SPECIFIC_CONSTANTS,
   INVENTORY_SYNC,
   API,
+  TELGOO5,
 };

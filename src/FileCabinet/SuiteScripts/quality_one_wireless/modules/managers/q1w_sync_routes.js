@@ -35,6 +35,24 @@ import Integration from './q1w_integration';
 const registerRoutes = (recordId, integrationId) => {
   // No routes registered by default. Extend this function (or replace this
   // module with project-specific wiring) to add selective routes.
+  //
+  // Telgoo5 inbound consumer routes (follow-up):
+  // Router.routeProcess(
+  //   `Telgoo5/ImportOrder/Bulk/${integrationId}`,
+  //   () => { /* consume Pending TELGOO5_INBOUND_ORDER queue rows */ }
+  // );
+  // Router.routeProcess(
+  //   `Telgoo5/ImportReturnAuthorization/Bulk/${integrationId}`,
+  //   () => { /* consume Pending TELGOO5_INBOUND_RETURN queue rows */ }
+  // );
+  // Router.routeProcess(
+  //   `Telgoo5/ImportOrder/Selective/${integrationId}`,
+  //   () => { /* selective sync for a single order queue recordId */ }
+  // );
+  // Router.routeProcess(
+  //   `Telgoo5/ImportReturnAuthorization/Selective/${integrationId}`,
+  //   () => { /* selective sync for a single return queue recordId */ }
+  // );
 };
 
 const getSelectiveSyncEntries = () => {

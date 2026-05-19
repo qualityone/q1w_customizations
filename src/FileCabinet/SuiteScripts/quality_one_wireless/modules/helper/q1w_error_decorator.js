@@ -1,3 +1,7 @@
+/**
+ * q1w_error_decorator.js
+ * @NApiVersion 2.1
+ */
 const errorType = {
   BAD_REQUEST: 400,
   NOT_FOUND: 404,
