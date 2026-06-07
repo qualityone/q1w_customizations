@@ -106,5 +106,37 @@
         </single>
       </recurrence>
     </scriptdeployment>
+    <scriptdeployment scriptid="customdeploy_q1w_magicjack_order_prdcr">
+      <custscript_q1w_prdcr_is_selective>F</custscript_q1w_prdcr_is_selective>
+      <custscript_q1w_producer_config_id></custscript_q1w_producer_config_id>
+      <custscript_q1w_producer_route_path>MagicJack/ImportOrder/Bulk</custscript_q1w_producer_route_path>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <status>NOTSCHEDULED</status>
+      <title>Q1W MagicJack Order Producer</title>
+      <recurrence>
+        <single>
+          <repeat></repeat>
+          <startdate>2026-01-01</startdate>
+          <starttime>00:00:00Z</starttime>
+        </single>
+      </recurrence>
+    </scriptdeployment>
+    <scriptdeployment scriptid="customdeploy_q1w_magicjack_ship_prdcr">
+      <custscript_q1w_prdcr_is_selective>F</custscript_q1w_prdcr_is_selective>
+      <custscript_q1w_producer_config_id></custscript_q1w_producer_config_id>
+      <custscript_q1w_producer_route_path>MagicJack/ReportShipments/Bulk</custscript_q1w_producer_route_path>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <status>NOTSCHEDULED</status>
+      <title>Q1W MagicJack Shipment Producer</title>
+      <recurrence>
+        <single>
+          <repeat></repeat>
+          <startdate>2026-01-01</startdate>
+          <starttime>00:00:00Z</starttime>
+        </single>
+      </recurrence>
+    </scriptdeployment>
   </scriptdeployments>
 </scheduledscript>

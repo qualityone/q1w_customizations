@@ -46,6 +46,7 @@ const handleSelectiveRecordsProduce = () => {
 };
 
 const handleScheduledSyncRecordsProduce = () => {
+  DashboardManager.registerProducerRoutes();
   Router.executeByRoute({
     routeParam: 'custscript_q1w_producer_route_path',
     configParam: 'custscript_q1w_producer_config_id',

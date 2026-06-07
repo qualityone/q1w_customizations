@@ -24,3 +24,5 @@ alwaysApply: true
 - SuiteQL: `createdfrom` is on `transactionline`, not `transaction`—use `tl.createdfrom` + `tl.transaction` (e.g. IN subquery) for “created from” links
 - SS2.1 RESTlet JSON GET/POST: Postman must send `Content-Type: application/json`; XML header on JSON return → UNEXPECTED_ERROR
 - Empty XML tags can parse as Object.create(null); coerce to '' before String() to avoid TypeError
+- Cursor sandbox may not include npm; validate builds via CI/SDF tools if npm is unavailable locally
+- N/sftp password auth: use `sftpPasswordGuid` in Integration Config JSON (credential GUID), not plaintext password

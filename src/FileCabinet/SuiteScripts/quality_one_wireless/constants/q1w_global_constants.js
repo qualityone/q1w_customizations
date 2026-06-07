@@ -570,6 +570,53 @@ const TELGOO5 = {
   MAX_ORDER_NUMBER_LENGTH: 25,
 };
 
+const MAGICJACK = {
+  SYSTEM: 'MagicJack',
+  FEATURES: {
+    IMPORT_ORDER: 'ImportOrder',
+    REPORT_SHIPMENTS: 'ReportShipments',
+  },
+  CSV_DELIMITER: '|',
+  EXPECTED_COLUMN_COUNT: 21,
+  CSV_COLUMNS: {
+    ORDER_ID: 0,
+    FNAME: 1,
+    MIDDLE_NAME: 2,
+    LNAME: 3,
+    ADDR1: 4,
+    ADDR2: 5,
+    CITY: 6,
+    STATE: 7,
+    ZIP: 8,
+    COUNTRY: 9,
+    EXT_PROD_CODE: 10,
+    SHIP_METHOD: 11,
+    QUANTITY: 12,
+    ORDER_INIT_DATE: 13,
+    MEMBERID: 14,
+    PIN: 15,
+    SERVICE_ACTIVATION_DATE: 16,
+    BILLING_TELEPHONE: 17,
+    RMA_NUMBER: 18,
+    RMA_DATE: 19,
+    LOB: 20,
+  },
+  QUEUE_ACTIONS: {
+    IMPORT_ORDER: 'ImportOrderBulk',
+    REPORT_SHIPMENTS: 'ReportShipmentsBulk',
+  },
+  RECORD_TYPES: {
+    INBOUND_ORDER_FILE: 'MAGICJACK_INBOUND_ORDER_FILE',
+    SHIPMENT: 'MAGICJACK_SHIPMENT',
+  },
+  COUNTRY_MAP: {
+    CANADA: 'CA',
+    UNITED_STATES: 'US',
+    USA: 'US',
+  },
+  SHIPMENT_FILE_PREFIX: 'MJ-SHIPPED_',
+};
+
 // Default export with all constants
 export default {
   RECORD_TYPES,
@@ -592,4 +639,5 @@ export default {
   INVENTORY_SYNC,
   API,
   TELGOO5,
+  MAGICJACK,
 };

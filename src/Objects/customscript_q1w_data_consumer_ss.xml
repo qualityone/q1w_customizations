@@ -63,5 +63,35 @@
     </scriptcustomfield>
   </scriptcustomfields>
   <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_q1w_magicjack_dta_cnsmr">
+      <custscript_q1w_consumer_config_id></custscript_q1w_consumer_config_id>
+      <custscript_q1w_consumer_route_path>MagicJack/ImportOrder/Bulk</custscript_q1w_consumer_route_path>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <status>NOTSCHEDULED</status>
+      <title>Q1W MagicJack Data Consumer</title>
+      <recurrence>
+        <single>
+          <repeat></repeat>
+          <startdate>2026-01-01</startdate>
+          <starttime>00:00:00Z</starttime>
+        </single>
+      </recurrence>
+    </scriptdeployment>
+    <scriptdeployment scriptid="customdeploy_q1w_magicjack_ship_cnsmr">
+      <custscript_q1w_consumer_config_id></custscript_q1w_consumer_config_id>
+      <custscript_q1w_consumer_route_path>MagicJack/ReportShipments/Bulk</custscript_q1w_consumer_route_path>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <status>NOTSCHEDULED</status>
+      <title>Q1W MagicJack Shipment Consumer</title>
+      <recurrence>
+        <single>
+          <repeat></repeat>
+          <startdate>2026-01-01</startdate>
+          <starttime>00:00:00Z</starttime>
+        </single>
+      </recurrence>
+    </scriptdeployment>
   </scriptdeployments>
 </scheduledscript>

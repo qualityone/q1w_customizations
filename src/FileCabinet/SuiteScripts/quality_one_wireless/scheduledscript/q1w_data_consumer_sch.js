@@ -5,11 +5,13 @@
 
 import log from 'N/log';
 import Router from '../modules/managers/q1w_router';
+import SyncRoutes from '../modules/managers/q1w_sync_routes';
 
 const IS_CONSUMER = true;
 
 const execute = () => {
   try {
+    SyncRoutes.registerConsumerRoutes();
     Router.executeByRoute({
       routeParam: 'custscript_q1w_consumer_route_path',
       configParam: 'custscript_q1w_consumer_config_id',

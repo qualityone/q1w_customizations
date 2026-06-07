@@ -30,7 +30,14 @@
  *   };
  */
 
+import Consumer from './q1w_consumer';
+import Producer from './q1w_producer';
+import Router from './q1w_router';
 import Integration from './q1w_integration';
+import MagicJackManager from './q1w_magicjack_manager';
+import CONSTANTS from '../../constants/q1w_global_constants';
+
+const { MAGICJACK } = CONSTANTS;
 
 const registerRoutes = (recordId, integrationId) => {
   // No routes registered by default. Extend this function (or replace this
@@ -55,11 +62,42 @@ const registerRoutes = (recordId, integrationId) => {
   // );
 };
 
+const registerProducerRoutes = () => {
+  Router.routeProcess(`MagicJack/${MAGICJACK.FEATURES.IMPORT_ORDER}/Bulk`, () => {
+    const currentConfig = Integration.getCurrentConfig() || {};
+    return Producer.produceRecords(
+      () => MagicJackManager.produceOrderFiles(currentConfig),
+      (dataObj) => {
+        MagicJackManager.moveOrderFileToProcessed(currentConfig, dataObj.sourceFileName);
+        return {};
+      }
+    );
+  });
+
+  Router.routeProcess(`MagicJack/${MAGICJACK.FEATURES.REPORT_SHIPMENTS}/Bulk`, () => {
+    return Producer.produceRecords(
+      () => MagicJackManager.produceShipmentPayloads(),
+      () => ({})
+    );
+  });
+};
+
+const registerConsumerRoutes = () => {
+  Router.routeProcess(`MagicJack/${MAGICJACK.FEATURES.IMPORT_ORDER}/Bulk`, () => {
+    return Consumer.consumeRecords(MagicJackManager.processFile, () => ({}));
+  });
+  Router.routeProcess(`MagicJack/${MAGICJACK.FEATURES.REPORT_SHIPMENTS}/Bulk`, () => {
+    return Consumer.consumeRecords(MagicJackManager.consumeShipmentPayload, () => ({}));
+  });
+};
+
 const getSelectiveSyncEntries = () => {
   return Integration.getSelectiveSyncEntries() || [];
 };
 
 export default {
   registerRoutes,
+  registerProducerRoutes,
+  registerConsumerRoutes,
   getSelectiveSyncEntries,
 };
