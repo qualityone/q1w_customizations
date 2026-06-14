@@ -9,7 +9,13 @@ import FeatureConfigDao from '../dao/q1w_feature_config_dao';
 import Lookup from '../dao/q1w_lookup_table_dao';
 import RecordReference from '../dao/q1w_records_reference_dao';
 import SyncQueueDao from '../dao/q1w_sync_queue_dao';
+import ShipConfigDao from '../dao/q1w_integration_config_ship_dao';
+import PaymentConfigDao from '../dao/q1w_integration_config_pymt_dao';
+import InventoryItemDao from '../dao/q1w_inventory_item_dao';
 import General from '../helper/q1w_general';
+import CONSTANTS from '../../constants/q1w_global_constants';
+
+const { MAGICJACK } = CONSTANTS;
 
 let configInstances = null;
 let currentConfig = null;
@@ -69,6 +75,216 @@ const lookupValueByType = (lookupType, lookupKey, allowDefault = true, allowNull
     value: valToReturn || null,
   });
   return valToReturn || (allowNullReturn ? null : lookupKey);
+};
+
+const getStoreDefaults = () => {
+  const logTitle = 'q1w_integration => getStoreDefaults';
+  try {
+    if (!currentConfig || !currentConfig.id) {
+      throw new Error('Current integration config is not set');
+    }
+    const storeDefaults = ConfigDao.getStoreDefaults(currentConfig.id);
+    const requiredFields = ['subsidiary', 'brand', 'location', 'department', 'salesChannel', 'taxItem'];
+    const missingFields = requiredFields.filter((fieldId) => !storeDefaults[fieldId]);
+    if (missingFields.length > 0) {
+      throw new Error(`Integration config missing required store defaults: ${missingFields.join(', ')}`);
+    }
+    return storeDefaults;
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack }),
+    });
+    throw error;
+  }
+};
+
+const getUniqueShipMethodsFromCsvRows = (csvRows = []) => {
+  const shipMethods = new Set();
+  csvRows.forEach((csvRow) => {
+    if (!Array.isArray(csvRow)) {
+      return;
+    }
+    const shipMethod = String(csvRow[MAGICJACK.CSV_COLUMNS.SHIP_METHOD] || '').trim();
+    if (shipMethod) {
+      shipMethods.add(shipMethod);
+    }
+  });
+  return Array.from(shipMethods);
+};
+
+const resolveShipMethod = (externalShipMethod) => {
+  const logTitle = 'q1w_integration => resolveShipMethod';
+  try {
+    const trimmed = String(externalShipMethod || '').trim();
+    if (!trimmed) {
+      return null;
+    }
+    if (
+      !ShipConfigDao.hasShipMappingRecord({
+        integrationId: currentConfig.id,
+        externalShipMethod: trimmed,
+      })
+    ) {
+      throw new Error(`Ship method mapping record not found for: ${trimmed}`);
+    }
+    if (
+      !ShipConfigDao.isShipMappingComplete({
+        integrationId: currentConfig.id,
+        externalShipMethod: trimmed,
+      })
+    ) {
+      throw new Error(`Ship method mapping not configured in NetSuite for: ${trimmed}`);
+    }
+    return ShipConfigDao.getShipMethodId({
+      integrationId: currentConfig.id,
+      externalShipMethod: trimmed,
+    });
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack, externalShipMethod }),
+    });
+    throw error;
+  }
+};
+
+const validatePaymentMapping = () => {
+  const externalPaymentMethod = MAGICJACK.RAW_PAYMENT_METHOD;
+  if (
+    !PaymentConfigDao.hasPaymentMappingRecord({
+      integrationId: currentConfig.id,
+      externalPaymentMethod,
+    })
+  ) {
+    throw new Error(`Payment method mapping record not found for: ${externalPaymentMethod}`);
+  }
+  if (
+    !PaymentConfigDao.isPaymentMappingComplete({
+      integrationId: currentConfig.id,
+      externalPaymentMethod,
+    })
+  ) {
+    throw new Error(`Payment method mapping not configured in NetSuite for: ${externalPaymentMethod}`);
+  }
+};
+
+const ensureOrderMappingStubs = (csvRows = []) => {
+  const logTitle = 'q1w_integration => ensureOrderMappingStubs';
+  try {
+    if (!currentConfig || !currentConfig.id) {
+      throw new Error('Current integration config is not set');
+    }
+    let createdCount = 0;
+    const uniqueShipMethods = getUniqueShipMethodsFromCsvRows(csvRows);
+    uniqueShipMethods.forEach((shipMethod) => {
+      const recordId = ShipConfigDao.createShipMappingStub({
+        integrationId: currentConfig.id,
+        externalShipMethod: shipMethod,
+      });
+      if (recordId) {
+        createdCount += 1;
+      }
+    });
+
+    const paymentRecordId = PaymentConfigDao.createPaymentMappingStub({
+      integrationId: currentConfig.id,
+      externalPaymentMethod: MAGICJACK.RAW_PAYMENT_METHOD,
+    });
+    if (paymentRecordId) {
+      createdCount += 1;
+    }
+
+    if (createdCount > 0) {
+      ShipConfigDao.clearCache();
+      PaymentConfigDao.clearCache();
+    }
+
+    log.debug({
+      title: logTitle,
+      details: JSON.stringify({
+        integrationId: currentConfig.id,
+        uniqueShipMethods,
+        createdCount,
+      }),
+    });
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack }),
+    });
+    throw error;
+  }
+};
+
+const validateOrderMappings = (csvRows = []) => {
+  const logTitle = 'q1w_integration => validateOrderMappings';
+  try {
+    validatePaymentMapping();
+    const uniqueShipMethods = getUniqueShipMethodsFromCsvRows(csvRows);
+    uniqueShipMethods.forEach((shipMethod) => {
+      if (
+        !ShipConfigDao.hasShipMappingRecord({
+          integrationId: currentConfig.id,
+          externalShipMethod: shipMethod,
+        })
+      ) {
+        throw new Error(`Ship method mapping record not found for: ${shipMethod}`);
+      }
+      if (
+        !ShipConfigDao.isShipMappingComplete({
+          integrationId: currentConfig.id,
+          externalShipMethod: shipMethod,
+        })
+      ) {
+        throw new Error(`Ship method mapping not configured in NetSuite for: ${shipMethod}`);
+      }
+    });
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack }),
+    });
+    throw error;
+  }
+};
+
+const validatePaymentMethod = () => {
+  const logTitle = 'q1w_integration => validatePaymentMethod';
+  try {
+    validatePaymentMapping();
+    return PaymentConfigDao.getPaymentMethodId({
+      integrationId: currentConfig.id,
+      externalPaymentMethod: MAGICJACK.RAW_PAYMENT_METHOD,
+    });
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack }),
+    });
+    throw error;
+  }
+};
+
+const resolveItemBySku = (sku) => {
+  const logTitle = 'q1w_integration => resolveItemBySku';
+  try {
+    const trimmed = String(sku || '').trim();
+    if (!trimmed) {
+      throw new Error('Item SKU is required');
+    }
+    const itemInternalId = InventoryItemDao.getItemInternalIdBySku(trimmed);
+    if (!itemInternalId) {
+      throw new Error(`NetSuite item not found for SKU: ${trimmed}`);
+    }
+    return itemInternalId;
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack, sku }),
+    });
+    throw error;
+  }
 };
 
 const upsertReference = ({ recordId, recordReference, featureConfigId }) => {
@@ -216,6 +432,12 @@ export default {
   getCurrentFeatureConfig,
   upsertFeatureConfig,
   lookupValueByType,
+  getStoreDefaults,
+  resolveShipMethod,
+  validatePaymentMethod,
+  ensureOrderMappingStubs,
+  validateOrderMappings,
+  resolveItemBySku,
   upsertReference,
   getConfigsAndFeatures,
   getSelectivePendingEntries,

@@ -1,5 +1,6 @@
 <customrecordtype scriptid="customrecord_q1w_integration_config">
   <accesstype>CUSTRECORDENTRYPERM</accesstype>
+  <aidescription></aidescription>
   <allowattachments>F</allowattachments>
   <allowinlinedeleting>F</allowinlinedeleting>
   <allowinlinedetaching>T</allowinlinedetaching>
@@ -14,6 +15,7 @@
   <enabledle>T</enabledle>
   <enablekeywords>T</enablekeywords>
   <enablemailmerge>F</enablemailmerge>
+  <enablenametranslation>F</enablenametranslation>
   <enablenumbering>F</enablenumbering>
   <enableoptimisticlocking>T</enableoptimisticlocking>
   <enablesystemnotes>T</enablesystemnotes>
@@ -42,6 +44,7 @@
   <customrecordcustomfields>
     <customrecordcustomfield scriptid="custrecord_q1w_ic_system">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -53,6 +56,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -81,6 +85,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_q1w_ic_configjson">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -92,6 +97,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>CLOBTEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -120,6 +126,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_q1w_ic_endpoint">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -131,6 +138,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -159,6 +167,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_q1w_ic_username">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -170,6 +179,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -198,6 +208,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_q1w_ic_password">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -209,6 +220,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -237,6 +249,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_q1w_ic_slctv_prdcr_dep_id">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -248,6 +261,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -274,5 +288,257 @@
       <storevalue>T</storevalue>
       <subtab></subtab>
     </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_q1w_ic_subsidiary">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>SELECT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <isparent>F</isparent>
+      <label>Subsidiary</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete>NO_ACTION</onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype>-117</selectrecordtype>
+      <showinlist>F</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab>[scriptid=customrecord_q1w_integration_config.tab_927_8119765_sb1_967]</subtab>
+    </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_q1w_ic_brand">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>SELECT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <isparent>F</isparent>
+      <label>Brand</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete>NO_ACTION</onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype>[scriptid=customlist_brand]</selectrecordtype>
+      <showinlist>T</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab>[scriptid=customrecord_q1w_integration_config.tab_927_8119765_sb1_967]</subtab>
+    </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_q1w_ic_location">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>SELECT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <isparent>F</isparent>
+      <label>Location</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete>NO_ACTION</onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype>-103</selectrecordtype>
+      <showinlist>F</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab>[scriptid=customrecord_q1w_integration_config.tab_927_8119765_sb1_967]</subtab>
+    </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_q1w_ic_department">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>SELECT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <isparent>F</isparent>
+      <label>Department</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete>NO_ACTION</onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype>-102</selectrecordtype>
+      <showinlist>T</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab>[scriptid=customrecord_q1w_integration_config.tab_927_8119765_sb1_967]</subtab>
+    </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_q1w_ic_sales_channel">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>SELECT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <isparent>F</isparent>
+      <label>Sales Channel</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete>NO_ACTION</onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype>-101</selectrecordtype>
+      <showinlist>F</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab>[scriptid=customrecord_q1w_integration_config.tab_927_8119765_sb1_967]</subtab>
+    </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_q1w_ic_tax_item">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>SELECT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <isparent>F</isparent>
+      <label>Tax Item</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete>NO_ACTION</onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype>-128</selectrecordtype>
+      <showinlist>T</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab>[scriptid=customrecord_q1w_integration_config.tab_927_8119765_sb1_967]</subtab>
+    </customrecordcustomfield>
   </customrecordcustomfields>
+  <subtabs>
+    <subtab scriptid="tab_927_8119765_sb1_967">
+      <tabparent></tabparent>
+      <tabtitle>General Field Mappings</tabtitle>
+    </subtab>
+  </subtabs>
 </customrecordtype>

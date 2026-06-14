@@ -24,17 +24,23 @@ const ENVIRONMENT_SPECIFIC_CONSTANTS = {
       // Add production image URLs here
       // LOADING_IMAGE: 'https://ACCOUNT_ID.app.netsuite.com/...',
     },
-    // Anything else
+    MAGICJACK: {
+      SO_CUSTOM_FORM_ID: '',
+    },
   },
   SB2: {
     URLS: {},
     IMAGES: {},
-    // Anything else
+    MAGICJACK: {
+      SO_CUSTOM_FORM_ID: '418',
+    },
   },
   SB1: {
     URLS: {},
     IMAGES: {},
-    // Anything else
+    MAGICJACK: {
+      SO_CUSTOM_FORM_ID: '418',
+    },
   },
 };
 
@@ -431,15 +437,10 @@ const INVENTORY_SYNC = {
  * Add your project-specific custom fields here
  */
 const CUSTOM_FIELD_IDS = {
-  // Body fields (custbody_)
-  // APPROVAL_STATUS: 'custbody_q1w_approval_status',
-  // COMMISSION_RATE: 'custbody_q1w_commission_rate',
-  // Line fields (custcol_)
-  // LINE_DISCOUNT: 'custcol_q1w_line_discount',
-  // Entity fields (custentity_)
-  // CUSTOMER_TYPE: 'custentity_q1w_customer_type',
-  // Item fields (custitem_)
-  // ITEM_CATEGORY: 'custitem_q1w_item_category',
+  BRAND_TRANSACTION: 'custbody_brand_transaction',
+  PACKING_SLIP_PASSTHRU: 'custbody_packing_slip_passthru',
+  SALES_CHANNEL: 'custentityter_sales_channel',
+  REGION: 'custentityter_region',
 };
 
 /**
@@ -572,6 +573,36 @@ const TELGOO5 = {
 
 const MAGICJACK = {
   SYSTEM: 'MagicJack',
+  ORDER_PREFIX: 'MJ',
+  RAW_PAYMENT_METHOD: 'notProvided',
+  CUSTOMER_TERMS_ID: '23',
+  CUSTOMER_REGION_ID: '2',
+  CUSTOMER_BILLING_COUNTRY: 'US',
+  SO_ORDER_STATUS: 'B',
+  SO_PRICE_LEVEL_ID: '-1',
+  SO_SHIPPING_COST: 0,
+  SO_LINE_RATE: 0,
+  DEFAULT_SO_CUSTOM_FORM_ID: '418',
+  INTEGRATION_CONFIG_FIELDS: {
+    SUBSIDIARY: 'custrecord_q1w_ic_subsidiary',
+    BRAND: 'custrecord_q1w_ic_brand',
+    LOCATION: 'custrecord_q1w_ic_location',
+    DEPARTMENT: 'custrecord_q1w_ic_department',
+    SALES_CHANNEL: 'custrecord_q1w_ic_sales_channel',
+    TAX_ITEM: 'custrecord_q1w_ic_tax_item',
+  },
+  SHIP_CONFIG: {
+    RECORD_TYPE: 'customrecord_q1w_integration_config_ship',
+    INTEGRATION: 'custrecord_q1w_ic_ship_integration',
+    EXTERNAL_SHIPPING: 'custrecord_q1w_ic_external_shipping',
+    NETSUITE_SHIPPING: 'custrecord_q1w_ic_netsuite_shipping',
+  },
+  PAYMENT_CONFIG: {
+    RECORD_TYPE: 'customrecord_q1w_integration_config_pymt',
+    INTEGRATION: 'custrecord_q1w_ic_pymt_integration',
+    EXTERNAL_PAYMENT: 'custrecord_q1w_ic_external_pymt_method',
+    NETSUITE_PAYMENT: 'custrecord_q1w_ic_netsuite_pymt_method',
+  },
   FEATURES: {
     IMPORT_ORDER: 'ImportOrder',
     REPORT_SHIPMENTS: 'ReportShipments',

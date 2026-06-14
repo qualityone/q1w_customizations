@@ -88,6 +88,7 @@ const produceOrderFiles = (currentConfig = {}) => {
       if (csvRows.length === 0) {
         return;
       }
+      Integration.ensureOrderMappingStubs(csvRows);
       filePayloads.push(buildOrderFilePayload(fileName, csvRows));
     });
 
@@ -126,14 +127,16 @@ const moveOrderFileToProcessed = (currentConfig = {}, sourceFileName = '') => {
   }
 };
 
-const processSingleOrderRow = ({ rowPayload }) => {
+const processSingleOrderRow = ({ rowPayload, storeDefaults }) => {
   const validatedResult = Validator.validateRow(rowPayload.csvRawData || []);
   if (!validatedResult.isValid) {
     throw new Error(`Row validation failed for order ${rowPayload.orderId}: ${validatedResult.errors.join('; ')}`);
   }
 
   const { validatedData } = validatedResult;
-  const customerPayload = Transformer.transformToCustomer(validatedData);
+  const orderNumber = Transformer.makeOrderNumber(validatedData.order_id);
+
+  const customerPayload = Transformer.transformToCustomer({ validatedData, storeDefaults });
   CustomerDao.setIdentifier('email');
   const customerResp = CustomerDao.upsertCustomer({
     body: customerPayload.body,
@@ -143,19 +146,18 @@ const processSingleOrderRow = ({ rowPayload }) => {
     throw new Error(`Customer upsert failed for order ${rowPayload.orderId}: ${customerResp.message}`);
   }
 
-  const itemInternalId = Integration.lookupValueByType('item_sku', validatedData.ext_prod_code, true, true);
-  if (!itemInternalId) {
-    throw new Error(`Item mapping missing for ext_prod_code: ${validatedData.ext_prod_code}`);
-  }
+  const itemInternalId = Integration.resolveItemBySku(validatedData.ext_prod_code);
 
-  const shipMethodInternalId = Integration.lookupValueByType('ship_method', validatedData.ship_method, true, true);
+  const shipMethodInternalId = Integration.resolveShipMethod(validatedData.ship_method);
 
-  SalesOrderDao.setIdentifier('otherrefnum');
+  SalesOrderDao.setIdentifier('externalid');
   const salesOrderPayload = Transformer.transformToSalesOrder({
     validatedData,
+    storeDefaults,
     customerId: customerResp.customerId,
     itemId: itemInternalId,
     shipMethodId: shipMethodInternalId,
+    orderNumber,
   });
   const salesOrderResp = SalesOrderDao.createSalesOrder(salesOrderPayload);
   if (!salesOrderResp.status || !salesOrderResp.upsertId) {
@@ -195,11 +197,14 @@ const processFile = (parsedEntry, currentConfig) => {
       };
     }
 
+    const storeDefaults = Integration.getStoreDefaults();
+    Integration.validateOrderMappings(rows.map((row) => row.csvRawData || []));
+
     const rowErrors = [];
     for (let i = 0; i < rows.length; i++) {
       const rowPayload = rows[i];
       try {
-        processSingleOrderRow({ rowPayload });
+        processSingleOrderRow({ rowPayload, storeDefaults });
       } catch (rowError) {
         rowErrors.push({
           index: i,

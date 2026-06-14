@@ -72,7 +72,7 @@ const createSalesOrder = ({ body, items }) => {
       delete bodyFieldstoUpdate.subsidiary;
       log.debug('bodyFeidlstoupdate', bodyFieldstoUpdate);
       instance.setValuesToFields(nsRec, bodyFieldstoUpdate, isFieldMap);
-      instance.setValuesToSublistLine(nsRec, items, 'item', isFieldMap);
+      // instance.setValuesToSublistLine(nsRec, items, 'item', isFieldMap);
       const soRecId = nsRec.save();
       log.debug('SO Updated !!', soRecId);
       SOCreateResp.upsertId = nsRec.id;
