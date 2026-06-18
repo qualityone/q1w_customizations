@@ -14,6 +14,7 @@ const MODULE = 'q1w_integration_config_ship_dao';
 const { SHIP_CONFIG } = CONSTANTS.MAGICJACK;
 
 let shipMappingCache = null;
+let shipReverseCache = null;
 
 const normalizeExternalKey = (value = '') => {
   return String(value || '')
@@ -23,6 +24,7 @@ const normalizeExternalKey = (value = '') => {
 
 const clearCache = () => {
   shipMappingCache = null;
+  shipReverseCache = null;
 };
 
 const getShipMappingCache = () => {
@@ -42,9 +44,12 @@ const getShipMappingCache = () => {
     `;
     const results = query.runSuiteQL({ query: sql }).asMappedResults() || [];
     shipMappingCache = {};
+    shipReverseCache = {};
     results.forEach((row) => {
       const integrationId = String(row.integration_id || '');
       const externalKey = normalizeExternalKey(row.external_shipping);
+      const externalShipping = String(row.external_shipping || '').trim();
+      const shipMethodId = String(row.ship_method_id || '');
       if (!integrationId || !externalKey) {
         return;
       }
@@ -53,8 +58,15 @@ const getShipMappingCache = () => {
       }
       shipMappingCache[integrationId][externalKey] = {
         recordId: String(row.id || ''),
-        shipMethodId: String(row.ship_method_id || ''),
+        shipMethodId,
+        externalShipping,
       };
+      if (shipMethodId) {
+        if (!shipReverseCache[integrationId]) {
+          shipReverseCache[integrationId] = {};
+        }
+        shipReverseCache[integrationId][shipMethodId] = externalShipping;
+      }
     });
     return shipMappingCache;
   } catch (error) {
@@ -97,6 +109,25 @@ const getShipMethodId = ({ integrationId, externalShipMethod }) => {
     log.error({
       title: logTitle,
       details: JSON.stringify({ message: error.message, stack: error.stack, integrationId, externalShipMethod }),
+    });
+    throw error;
+  }
+};
+
+const getExternalShipMethodByNsId = ({ integrationId, shipMethodId }) => {
+  const logTitle = `${MODULE} => getExternalShipMethodByNsId`;
+  try {
+    const nsShipMethodId = String(shipMethodId || '').trim();
+    if (!nsShipMethodId || !integrationId) {
+      return null;
+    }
+    getShipMappingCache();
+    const reverseEntry = (shipReverseCache[String(integrationId)] || {})[nsShipMethodId];
+    return reverseEntry || null;
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack, integrationId, shipMethodId }),
     });
     throw error;
   }
@@ -150,5 +181,6 @@ export default {
   hasShipMappingRecord,
   isShipMappingComplete,
   getShipMethodId,
+  getExternalShipMethodByNsId,
   createShipMappingStub,
 };

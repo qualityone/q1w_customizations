@@ -149,6 +149,25 @@ const resolveShipMethod = (externalShipMethod) => {
   }
 };
 
+const resolveExternalShipMethod = (shipMethodId) => {
+  const logTitle = 'q1w_integration => resolveExternalShipMethod';
+  try {
+    if (!currentConfig || !currentConfig.id) {
+      throw new Error('Current integration config is not set');
+    }
+    return ShipConfigDao.getExternalShipMethodByNsId({
+      integrationId: currentConfig.id,
+      shipMethodId,
+    });
+  } catch (error) {
+    log.error({
+      title: logTitle,
+      details: JSON.stringify({ message: error.message, stack: error.stack, shipMethodId }),
+    });
+    throw error;
+  }
+};
+
 const validatePaymentMapping = () => {
   const externalPaymentMethod = MAGICJACK.RAW_PAYMENT_METHOD;
   if (
@@ -434,6 +453,7 @@ export default {
   lookupValueByType,
   getStoreDefaults,
   resolveShipMethod,
+  resolveExternalShipMethod,
   validatePaymentMethod,
   ensureOrderMappingStubs,
   validateOrderMappings,

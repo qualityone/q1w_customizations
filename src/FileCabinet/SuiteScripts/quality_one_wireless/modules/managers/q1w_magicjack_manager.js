@@ -6,13 +6,13 @@
  */
 
 import log from 'N/log';
-import query from 'N/query';
 import Papa from '../third_party/papaparse';
 import Integration from './q1w_integration';
 import Validator from './q1w_magicjack_validator';
 import Transformer from './q1w_magicjack_transformer';
 import CustomerDao from '../dao/q1w_customer_dao';
 import SalesOrderDao from '../dao/q1w_salesorder_dao';
+import ShipmentDao from '../dao/q1w_magicjack_shipment_dao';
 import SftpHelper from '../helper/q1w_sftp_helper';
 import CONSTANTS from '../../constants/q1w_global_constants';
 
@@ -266,80 +266,208 @@ const processFile = (parsedEntry, currentConfig) => {
   }
 };
 
-const getCandidateFulfillments = () => {
-  const sql = `
-    SELECT
-      ift.id AS fulfillment_id,
-      ift.trandate AS shipped_date,
-      so.otherrefnum AS external_order_id,
-      cust.firstname AS first_name,
-      cust.lastname AS last_name,
-      so.shipaddress1 AS addr1,
-      so.shipaddress2 AS addr2,
-      so.shipcity AS city,
-      so.shipstate AS state,
-      so.shipzip AS zip,
-      so.shipcountry AS country,
-      item.itemid AS sku,
-      ift.shipmethod AS ship_method,
-      ift.trackingnumbers AS tracking_number
-    FROM transaction ift
-    INNER JOIN transactionline iftl ON iftl.transaction = ift.id AND iftl.mainline = 'T'
-    LEFT JOIN transaction so ON so.id = ift.createdfrom
-    LEFT JOIN customer cust ON cust.id = so.entity
-    LEFT JOIN transactionline soline ON soline.transaction = so.id AND soline.mainline = 'F'
-    LEFT JOIN item ON item.id = soline.item
-    WHERE ift.recordtype = 'itemfulfillment'
-      AND ift.shipstatus = 'C'
-      AND ift.mainline = 'T'
-      AND so.id IS NOT NULL
-  `;
-  return query
-    .runSuiteQL({
-      query: sql,
-    })
-    .asMappedResults();
+const stripOrderPrefix = (orderNumber = '') => {
+  const trimmed = String(orderNumber || '').trim();
+  const prefix = `${MAGICJACK.ORDER_PREFIX}_`;
+  if (trimmed.startsWith(prefix)) {
+    return trimmed.substring(prefix.length);
+  }
+  return trimmed;
+};
+
+const resolveExternalOrderId = ({ salesOrderId, salesOrderExternalId }) => {
+  const importedOrderId = Integration.getRecordReference({
+    nsRecordId: salesOrderId,
+    flow: 'IMPORT',
+    featureName: MAGICJACK.FEATURES.IMPORT_ORDER,
+  });
+  if (importedOrderId) {
+    return String(importedOrderId).trim();
+  }
+  return stripOrderPrefix(salesOrderExternalId);
+};
+
+const normalizeDeviceType = (deviceTypeHidden = '') => {
+  return String(deviceTypeHidden || '')
+    .trim()
+    .toUpperCase();
+};
+
+const hasRequiredEdfForFulfillment = (lines = [], edfLookup = {}, fulfillmentId = '') => {
+  const { DEVICE_TYPES } = MAGICJACK;
+  const missingLines = [];
+
+  lines.forEach((line) => {
+    const deviceType = normalizeDeviceType(line.deviceTypeHidden);
+    if (deviceType !== DEVICE_TYPES.SIM && deviceType !== DEVICE_TYPES.IMEI) {
+      return;
+    }
+    const itemInternalId = String(line.itemInternalId || '').trim();
+    const edfKey = `${fulfillmentId}|${itemInternalId}`;
+    const primarySn = String((edfLookup[edfKey] || {}).primarySn || '').trim();
+    if (!primarySn) {
+      missingLines.push({
+        itemInternalId,
+        sku: line.sku,
+        deviceType,
+      });
+    }
+  });
+
+  return {
+    isReady: missingLines.length === 0,
+    missingLines,
+  };
+};
+
+const buildFulfillmentDeviceInfo = (lines = [], edfLookup = {}, fulfillmentId = '') => {
+  let iccid = '';
+  let imei = '';
+  let otherSerial = '';
+  const { DEVICE_TYPES } = MAGICJACK;
+
+  lines.forEach((line) => {
+    const itemInternalId = String(line.itemInternalId || '').trim();
+    const edfKey = `${fulfillmentId}|${itemInternalId}`;
+    const edfEntry = edfLookup[edfKey] || {};
+    const serial = String(edfEntry.primarySn || '').trim();
+    if (!serial) {
+      return;
+    }
+
+    const deviceType = normalizeDeviceType(line.deviceTypeHidden);
+    if (deviceType === DEVICE_TYPES.IMEI) {
+      imei = serial;
+      return;
+    }
+    if (deviceType === DEVICE_TYPES.SIM) {
+      iccid = serial;
+      return;
+    }
+    otherSerial = serial;
+  });
+
+  if (iccid || imei) {
+    return `${iccid}${imei}`;
+  }
+  return otherSerial;
+};
+
+const buildEdfSerialLookup = (edfRows = []) => {
+  const lookup = {};
+  edfRows.forEach((edfRow) => {
+    const fulfillmentId = String(edfRow.fulfillmentId || '').trim();
+    const itemInternalId = String(edfRow.itemInternalId || '').trim();
+    if (!fulfillmentId || !itemInternalId) {
+      return;
+    }
+    const key = `${fulfillmentId}|${itemInternalId}`;
+    lookup[key] = {
+      primarySn: String(edfRow.primarySn || '').trim(),
+    };
+  });
+  return lookup;
+};
+
+const groupFulfillmentLines = (lines = []) => {
+  const grouped = {};
+  lines.forEach((line) => {
+    const fulfillmentId = String(line.fulfillmentId || '').trim();
+    if (!fulfillmentId) {
+      return;
+    }
+    if (!grouped[fulfillmentId]) {
+      grouped[fulfillmentId] = [];
+    }
+    grouped[fulfillmentId].push(line);
+  });
+  return grouped;
 };
 
 const produceShipmentPayloads = () => {
   const logTitle = `${MODULE} => produceShipmentPayloads`;
   try {
-    const fulfillments = getCandidateFulfillments() || [];
+    const storeDefaults = Integration.getStoreDefaults();
+    const brandId = storeDefaults.brand;
+    log.debug({ title: logTitle, details: JSON.stringify({ brandId }) });
+    if (!brandId) {
+      throw new Error('Integration config brand is required for shipment export');
+    }
+
+    const fulfillmentLines = ShipmentDao.getFulfillmentLineResults({ brandId }) || [];
+    log.debug({ title: logTitle, details: JSON.stringify({ fulfillmentLines }) });
+    const edfRows = ShipmentDao.getEdfSerialResults({ brandId }) || [];
+    log.debug({ title: logTitle, details: JSON.stringify({ edfRows }) });
+    const edfLookup = buildEdfSerialLookup(edfRows);
+    log.debug({ title: logTitle, details: JSON.stringify({ edfLookup }) });
+    const groupedLines = groupFulfillmentLines(fulfillmentLines);
+    log.debug({ title: logTitle, details: JSON.stringify({ groupedLines }) });
     const shipmentRows = [];
 
-    for (let i = 0; i < fulfillments.length; i++) {
-      const fulfillment = fulfillments[i];
-      const fulfillmentId = String(fulfillment.fulfillment_id || '');
-      if (!fulfillmentId) {
-        continue;
-      }
+    Object.keys(groupedLines).forEach((fulfillmentId) => {
       const existingReference = Integration.getRecordReference({
         nsRecordId: fulfillmentId,
         flow: 'EXPORT',
       });
       if (existingReference) {
-        continue;
+        return;
       }
+
+      const lines = groupedLines[fulfillmentId];
+      const firstLine = lines[0] || {};
+      const salesOrderId = String(firstLine.salesOrderId || '').trim();
+      const externalOrderId = resolveExternalOrderId({
+        salesOrderId,
+        salesOrderExternalId: firstLine.salesOrderExternalId,
+      });
+
+      if (!externalOrderId) {
+        log.debug({
+          title: logTitle,
+          details: JSON.stringify({
+            message: 'Skipping fulfillment without resolvable external order id',
+            fulfillmentId,
+            salesOrderId,
+          }),
+        });
+        return;
+      }
+
+      const edfCheck = hasRequiredEdfForFulfillment(lines, edfLookup, fulfillmentId);
+      if (!edfCheck.isReady) {
+        log.debug({
+          title: logTitle,
+          details: JSON.stringify({
+            message: 'Skipping fulfillment until EDF exists for all SIM/IMEI lines',
+            fulfillmentId,
+            missingLines: edfCheck.missingLines,
+          }),
+        });
+        return;
+      }
+
+      const externalShipMethod = Integration.resolveExternalShipMethod(firstLine.shipMethodId) || '';
 
       shipmentRows.push({
         fulfillmentId,
         csvRawData: Transformer.buildShipmentRow({
-          externalOrderId: fulfillment.external_order_id || '',
-          firstName: fulfillment.first_name || '',
-          lastName: fulfillment.last_name || '',
-          addr1: fulfillment.addr1 || '',
-          addr2: fulfillment.addr2 || '',
-          city: fulfillment.city || '',
-          state: fulfillment.state || '',
-          zip: fulfillment.zip || '',
-          country: fulfillment.country || '',
-          sku: fulfillment.sku || '',
-          shipMethod: fulfillment.ship_method || '',
-          shippedDate: formatDateYYYYMMDD(fulfillment.shipped_date),
-          trackingNumber: fulfillment.tracking_number || '',
+          externalOrderId,
+          firstName: firstLine.firstName || '',
+          lastName: firstLine.lastName || '',
+          addr1: firstLine.addr1 || '',
+          addr2: firstLine.addr2 || '',
+          city: firstLine.city || '',
+          state: firstLine.state || '',
+          zip: firstLine.zip || '',
+          country: Transformer.normalizeCountry(firstLine.country || ''),
+          sku: firstLine.sku || '',
+          shipMethod: externalShipMethod,
+          shippedDate: formatDateYYYYMMDD(firstLine.shippedDate),
+          trackingNumber: firstLine.trackingNumber || '',
+          deviceIdentifiers: buildFulfillmentDeviceInfo(lines, edfLookup, fulfillmentId),
         }),
       });
-    }
+    });
 
     if (shipmentRows.length === 0) {
       return {

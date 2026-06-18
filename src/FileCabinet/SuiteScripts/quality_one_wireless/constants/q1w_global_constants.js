@@ -646,6 +646,35 @@ const MAGICJACK = {
     USA: 'US',
   },
   SHIPMENT_FILE_PREFIX: 'MJ-SHIPPED_',
+  SHIPMENT_SEARCH: {
+    LOOKBACK: 'fivedaysago',
+    FULFILLMENT: {
+      SUBSIDIARIES: ['16', '4', '2', '11', '3', '5'],
+      CLASSES: ['3', '5', '1'],
+    },
+    EDF: {
+      RECORD_TYPE: 'customrecord_f5541001_edf_details',
+      SUBSIDIARIES: ['16', '2'],
+      CLASSES: ['5', '1'],
+      FIELDS: {
+        PRIMARY_SN: 'custrecord_qez55psn_primary_sn',
+        SALES_ORDER: 'custrecord_edf_sales_order',
+        ITEM_FULFILLMENT: 'custrecord_edf_item_fulfillment',
+        ITEM_RECORD_LINK: 'custrecord_edf_f5541001_item_record_link',
+      },
+    },
+    ITEM_FIELDS: {
+      DEVICE_TYPE_HIDDEN: 'custitem_device_type_new_hidden',
+    },
+    BODY_FIELDS: {
+      CARRIER_RFSS: 'custbody_carrier_out_rfss',
+    },
+  },
+  DEVICE_TYPES: {
+    IMEI: 'IMEI',
+    SIM: 'SIM',
+    OTHER: 'OTHER',
+  },
 };
 
 // Default export with all constants
