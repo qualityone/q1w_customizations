@@ -153,6 +153,7 @@ const BODY_FIELDS = {
  */
 const LINE_FIELDS = {
   ITEM: 'item',
+  ITEM_TYPE: 'itemtype',
   QUANTITY: 'quantity',
   QUANTITY_COMMITTED: 'quantitycommitted',
   QUANTITY_FULFILLED: 'quantityfulfilled',
@@ -174,6 +175,27 @@ const LINE_FIELDS = {
   COMMIT: 'commitinventory',
   ITEM_RECEIVE: 'itemreceive',
   ORDER_LINE: 'orderline',
+};
+
+/**
+ * Line itemtype values (as returned by getSublistValue on item.itemtype)
+ */
+const ITEM_TYPES = {
+  DISCOUNT: 'Discount',
+};
+
+/**
+ * Subsidiary internal IDs
+ */
+const SUBSIDIARIES = {
+  THREE_PL: '16',
+};
+
+/**
+ * Tax code internal IDs
+ */
+const TAX_CODES = {
+  NOT_TAXABLE: '-7',
 };
 
 /**
@@ -432,6 +454,7 @@ const INVENTORY_SYNC = {
  */
 const CUSTOM_FIELD_IDS = {
   // Body fields (custbody_)
+  TEST_ORDER: 'custbody_q1w_test_order',
   // APPROVAL_STATUS: 'custbody_q1w_approval_status',
   // COMMISSION_RATE: 'custbody_q1w_commission_rate',
   // Line fields (custcol_)
@@ -517,6 +540,9 @@ export default {
   RECORD_TYPES,
   BODY_FIELDS,
   LINE_FIELDS,
+  ITEM_TYPES,
+  SUBSIDIARIES,
+  TAX_CODES,
   SUBLIST_IDS,
   TRANSACTION_STATUS,
   ORDER_STATUS_VALUES,

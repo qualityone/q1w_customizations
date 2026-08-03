@@ -35,7 +35,8 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 - `q1w_global_constants.js` — plain objects, no `Object.freeze`, NO `N/runtime` import. Import directly into scripts for full intellisense support
 - Environment/account detection: use `q1w_global_helper.js` in `modules/helper/` with a `getEnvAccount()` function (uses `N/runtime` internally)
-- All scripts: `import C from 'q1w_global_constants';` (direct import, no init wrapper)
+- All scripts: `import CONSTANTS from 'q1w_global_constants';` (direct import, no init wrapper — never use single-letter aliases like `C`)
+- Never use single-letter local aliases for destructured objects (e.g. `const F = RECORD.FIELDS`) — use descriptive names like `APC_FIELDS`, `VCP_FIELDS`
 - `q1w_global_constants_init.js` is deprecated — do NOT use
 
 ## Error Handling
@@ -49,26 +50,31 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 ## Naming
 
-- Scripts: `q1w_<record>_<ue|cs|sl|ss|mr>.js` (all lowercase, `q1w_` prefix)
+- Scripts: `q1w_<ue|cs|sl|ss|mr>_<record>.js` (all lowercase, `q1w_` prefix, script type before record name)
 - Modules: `q1w_<domain>_manager.js` / `q1w_<entity>_dao.js` / `q1w_<purpose>_helper.js`
 - SDF: `customscript_q1w_` / `customdeploy_q1w_` / `custbody_q1w_` / `custcol_q1w_` / `custentity_q1w_` / `custitem_q1w_`
 - Custom records: `customrecord_q1w_<name>` · Lists: `customlist_q1w_<name>`
-- Multiple scripts per record: `q1w_salesorder_ue_2.js`
+- Multiple scripts per record: `q1w_ue_salesorder_2.js`
 
 ## Directory Structure
 
-`src/FileCabinet/SuiteScripts/quality_one_wireless/` → `userevent/`, `clientscript/`, `suitelet/`, `scheduledscript/`, `map_reduce/`, `modules/{managers,dao,helper}/`, `constants/`
+`src/FileCabinet/SuiteScripts/beyond-cloud-consulting/` → `userevent/`, `clientscript/`, `suitelet/`, `scheduledscript/`, `map_reduce/`, `modules/{managers,dao,helper}/`, `constants/`
+
+## Data Access
 
 ## Module Rules
 
+- **Managers are not mandatory.** Create a manager only when logic is (or will be) shared across multiple entry points (e.g., same logic needed in a UE and a CS, or across multiple record types). If only one entry point uses the logic, keep it inline in that entry point
+- Promote inline logic to a manager when a second consumer appears — move the shared code into `modules/managers/` and call it from both entry points. This reduces the number of files NetSuite has to load per record
 - Managers → DAOs + Helpers (never reverse). No circular deps
 - Single responsibility, JSDoc on exports, max 30-40 lines/fn
 - `q1w_global_helper.js` in `modules/helper/` — exports `getEnvAccount()` for environment/account detection via `N/runtime`, plus common UI/search/utility functions
+- **Batch field access:** when 3+ `getValue`/`setValue` or `getSublistValue`/`setSublistValue` calls run in a row against the same record, use the batch helpers in `q1w_global_helper.js` (`getValues`, `setValues`, `getSublistValues`, `setSublistValues`, `getCurrentSublistValues`, `setCurrentSublistValues`). Pass `{ record, sublistId?, line?, fieldIds | values }` and let the helper loop. Reduces line count and centralizes error handling around field access
 
 ## UserEvent Rules
 
 - One UE per record type, split at >10 imports (ue = beforeLoad/beforeSubmit, ue_2 = afterSubmit)
-- Thin entry points (max 20-30 lines), delegate to managers. `log.debug` at entry/exit
+- Thin entry points (max 20-30 lines). Keep logic inline unless shared — delegate to a manager only when multiple entry points need the same logic.
 - Handle CREATE/EDIT/DELETE(skip)/XEDIT/COPY
 - Check `runtime.executionContext` to prevent recursion
 - Performance: `Date.now()` timing, log duration via `log.audit` in `finally`
@@ -79,4 +85,4 @@ NetSuite modules → Managers → DAOs → Helpers → Constants
 
 ## Good Practice
 
-- When you hit an error, fix a bug, or learn something non-obvious (terminal, code, config, infra).
+- When you hit an error, fix a bug, or learn something non-obvious (terminal, code, config, infra), append a one-liner to `.cursor/rules/learnings.mdc`. Keep entries ultra-short (<120 chars or more less). No fluff. Read learnings first — never add duplicates

@@ -1,0 +1,29 @@
+---
+alwaysApply: true
+---
+# Learnings
+
+- Never use single-letter variable names (C, L) for constants imports — use descriptive names like CONSTANTS, LOT_DET
+- Import q1w_global_constants as CONSTANTS, then destructure: `const LOT_DET = CONSTANTS.LOT_NUMBER_DETAIL`
+- Only custpage\_\* runtime fields stay local in scripts; all shared IDs go in q1w_global_constants.js
+- When refactoring constants, only change imports/references — never touch logic
+- Module-level state vars must use `let` not `const` if they get reassigned in pageInit
+- Always add learnings to .kiro/steering/learnings.md when fixing bugs or learning something non-obvious
+- clientScriptModulePath in Suitelets must use full SuiteScripts path, not relative (e.g. 'SuiteScripts/beyond-cloud-consulting/clientscript/...')
+- INLINEHTML is NOT valid for sublist.addField() — only works on body-level form.addField(). Inject into existing column DOM cells instead.
+- Rental pattern: UE adds hidden body fields only; CS injects icon HTML into existing custcol DOM cell via document.getElementById().innerHTML
+- Inline HTML IS valid as a transaction line field type when created via NetSuite UI — just not via sublist.addField() in SuiteScript
+- Use a dedicated Inline HTML custcol for icon display, keep the SELECT custcol hidden for data storage — clean separation
+- Use native inventorydetail column (item_inventorydetail{line+1}\_fs) for non-inv item icon injection — cell is empty for non-inv items
+- Custom Inline HTML custcol fields may not show on forms; native inventorydetail column is always present on IF
+- setCurrentSublistValue for DATE fields in dynamic mode requires a Date object — use format.parse({ value, type: format.Type.DATE })
+- After nlapiCommitLineItem, DOM elements re-render — must call a refresh function to re-inject icons on all lines
+- sublist.setSublistValue for DATE on Suitelet forms expects a formatted string — use format.format({ value, type: format.Type.DATE })
+- removeLine on recmach sublist does NOT delete child records — it just unreferences them, leaving dangling records
+- To properly handle edits: track detail IDs in hidden sublist column, update existing via record.load/save, delete removed via record.delete, add new via recmach
+- SuiteQL: `createdfrom` is on `transactionline`, not `transaction`—use `tl.createdfrom` + `tl.transaction` (e.g. IN subquery) for “created from” links
+- SS2.1 RESTlet JSON GET/POST: Postman must send `Content-Type: application/json`; XML header on JSON return → UNEXPECTED_ERROR
+- Empty XML tags can parse as Object.create(null); coerce to '' before String() to avoid TypeError
+- Cursor sandbox may not include npm; validate builds via CI/SDF tools if npm is unavailable locally
+- N/sftp password auth: use `sftpPasswordGuid` in Integration Config JSON (credential GUID), not plaintext password
+- Never access N/* APIs (e.g. record.Type.*) at module top-level — only string literals; APIs unavailable in define callback
