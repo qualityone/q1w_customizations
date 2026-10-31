@@ -5,8 +5,9 @@
  * @NModuleScope Public
  * @NScriptType UserEventScript
  *
- * @description Sales Order beforeSubmit (Create / Edit). For the 3PL subsidiary:
- *   removes Discount line items, zeroes rate, and sets tax code to Not Taxable on remaining lines.
+ * @description Sales Order beforeSubmit (Create / Edit). When the subsidiary is 3PL,
+ *   or the header brand is Kaes or ITSkins: removes Discount line items, zeroes rate,
+ *   and sets tax code to Not Taxable on remaining lines.
  * @author Taha Aslam
  */
 
@@ -14,7 +15,8 @@ import log from 'N/log';
 
 import CONSTANTS from '../constants/q1w_global_constants';
 
-const { BODY_FIELDS, SUBSIDIARIES, TAX_CODES, SUBLIST_IDS, LINE_FIELDS, ITEM_TYPES } = CONSTANTS;
+const { BODY_FIELDS, SUBSIDIARIES, BRANDS, TAX_CODES, SUBLIST_IDS, LINE_FIELDS, ITEM_TYPES, CUSTOM_FIELD_IDS } =
+  CONSTANTS;
 
 /**
  * @param {Object} context - User event context
@@ -37,7 +39,10 @@ const beforeSubmit = (context) => {
     // }
 
     const subsidiaryId = String(salesOrder.getValue({ fieldId: BODY_FIELDS.SUBSIDIARY }));
-    if (subsidiaryId !== SUBSIDIARIES.THREE_PL) {
+    const brandId = String(salesOrder.getValue({ fieldId: CUSTOM_FIELD_IDS.BRAND_TRANSACTION }) || '');
+    const isThreePl = subsidiaryId === SUBSIDIARIES.THREE_PL;
+    const isTargetBrand = brandId === BRANDS.KAES || brandId === BRANDS.ITSKINS;
+    if (!isThreePl && !isTargetBrand) {
       return;
     }
 
@@ -77,7 +82,7 @@ const beforeSubmit = (context) => {
 
     log.audit({
       title: logTitle,
-      details: `subsidiary ${subsidiaryId} | removed discount lines: ${removed} | zeroed lines: ${zeroed}`,
+      details: `subsidiary ${subsidiaryId} | brand ${brandId} | removed discount lines: ${removed} | zeroed lines: ${zeroed}`,
     });
   } catch (error) {
     log.error({

@@ -192,6 +192,14 @@ const SUBSIDIARIES = {
 };
 
 /**
+ * Brand internal IDs (custbody_brand_transaction)
+ */
+const BRANDS = {
+  KAES: '173',
+  ITSKINS: '174',
+};
+
+/**
  * Tax code internal IDs
  */
 const TAX_CODES = {
@@ -455,6 +463,7 @@ const INVENTORY_SYNC = {
 const CUSTOM_FIELD_IDS = {
   // Body fields (custbody_)
   TEST_ORDER: 'custbody_q1w_test_order',
+  BRAND_TRANSACTION: 'custbody_brand_transaction',
   // APPROVAL_STATUS: 'custbody_q1w_approval_status',
   // COMMISSION_RATE: 'custbody_q1w_commission_rate',
   // Line fields (custcol_)
@@ -542,6 +551,7 @@ export default {
   LINE_FIELDS,
   ITEM_TYPES,
   SUBSIDIARIES,
+  BRANDS,
   TAX_CODES,
   SUBLIST_IDS,
   TRANSACTION_STATUS,
