@@ -457,12 +457,26 @@ const INVENTORY_SYNC = {
 };
 
 /**
+ * 3PL sales order Map/Reduce.
+ * Brand internal ids are supplied on the deployment and injected into the search.
+ */
+const THREE_PL_ORDER_MR = {
+  SCRIPT_PARAMS: {
+    BRAND_IDS: 'custscript_q1w_3pl_brand_ids',
+  },
+  MR_OUTPUT_KEYS: {
+    UPDATED: 'updated',
+    ERRORS: 'errors',
+  },
+};
+
+/**
  * Custom Field IDs
  * Add your project-specific custom fields here
  */
 const CUSTOM_FIELD_IDS = {
-  // Body fields (custbody_)
   TEST_ORDER: 'custbody_q1w_test_order',
+  ORDER_TO_BE_ZEROED: 'custbody_q1w_order_to_be_zeroed',
   BRAND_TRANSACTION: 'custbody_brand_transaction',
   // APPROVAL_STATUS: 'custbody_q1w_approval_status',
   // COMMISSION_RATE: 'custbody_q1w_commission_rate',
@@ -568,4 +582,5 @@ export default {
   CURRENCIES,
   ENVIRONMENT_SPECIFIC_CONSTANTS,
   INVENTORY_SYNC,
+  THREE_PL_ORDER_MR,
 };

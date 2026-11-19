@@ -27,3 +27,4 @@ alwaysApply: true
 - Cursor sandbox may not include npm; validate builds via CI/SDF tools if npm is unavailable locally
 - N/sftp password auth: use `sftpPasswordGuid` in Integration Config JSON (credential GUID), not plaintext password
 - Never access N/* APIs (e.g. record.Type.*) at module top-level — only string literals; APIs unavailable in define callback
+- no-control-regex: build NetSuite multi-select split via `new RegExp` + `String.fromCharCode(5)`, not `/\u0005/`
