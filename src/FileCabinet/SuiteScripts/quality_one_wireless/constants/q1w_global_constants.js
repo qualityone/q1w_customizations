@@ -471,6 +471,26 @@ const THREE_PL_ORDER_MR = {
 };
 
 /**
+ * GRE/BBH device bind on Item Fulfillment create.
+ * EDF holds the device IMEIs that are matched to fulfillment lines.
+ */
+const BBH = {
+  BRAND_INTERNAL_ID: '160',
+  DEVICE_BIND_URL: 'https://partners.greatcall.com/binding/api/device',
+  AUTHORIZATION: 'GCBinding m3S#4k^GFT21VQzKMprp$4Y5e9h6EW8id8',
+  REQUEST_SOURCE: 'IceMobilityProd',
+  SUCCESS_HTTP_CODE: 200,
+  EDF: {
+    RECORD_TYPE: 'customrecord_f5541001_edf_details',
+    FIELDS: {
+      ITEM_FULFILLMENT: 'custrecord_edf_item_fulfillment',
+      IMEI: 'custrecord_qez55imei_sn_imei',
+      ITEM_RECORD_LINK: 'custrecord_edf_f5541001_item_record_link',
+    },
+  },
+};
+
+/**
  * Custom Field IDs
  * Add your project-specific custom fields here
  */
@@ -478,6 +498,8 @@ const CUSTOM_FIELD_IDS = {
   TEST_ORDER: 'custbody_q1w_test_order',
   ORDER_TO_BE_ZEROED: 'custbody_q1w_order_to_be_zeroed',
   BRAND_TRANSACTION: 'custbody_brand_transaction',
+  JPT_CODE: 'custcol_q1w_jpt_code',
+  BBH_VALIDATION_FAILED: 'custbody_bbh_validation_failed',
   // APPROVAL_STATUS: 'custbody_q1w_approval_status',
   // COMMISSION_RATE: 'custbody_q1w_commission_rate',
   // Line fields (custcol_)
@@ -583,4 +605,5 @@ export default {
   ENVIRONMENT_SPECIFIC_CONSTANTS,
   INVENTORY_SYNC,
   THREE_PL_ORDER_MR,
+  BBH,
 };
